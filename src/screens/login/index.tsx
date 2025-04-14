@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faUser } from '@fortawesome/free-regular-svg-icons/faUser';
 import { faEye } from '@fortawesome/free-regular-svg-icons/faEye';
+import { faCircleQuestion } from '@fortawesome/free-regular-svg-icons/faCircleQuestion';
 import { useNavigation } from '@react-navigation/native'; // Importando o hook de navegação
 import { styles } from './style';
 
@@ -30,11 +31,16 @@ export default function LoginScreen() {
         <View style={styles.mainContainer}>
             {/* Sessão da Logo */}
             <View style={{ gap: 15 }}>
-                <Text style={styles.Logo}>
-                    <Text style={{ color: '#2D9CDB' }}>Ser</Text>
-                    <Text style={{ color: '#F2C94C' }}>Bank</Text>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Text style={styles.Logo}>
+                        <Text style={{ color: '#2D9CDB' }}>Ser</Text>
+                        <Text style={{ color: '#F2C94C' }}>Bank</Text>
+                    </Text>
+                    <FontAwesomeIcon icon={faCircleQuestion} style={{ color: 'gray' }} />
+                </View>
+                <Text style={styles.title}>
+                    Bem vindo ao banco do futuro!
                 </Text>
-                <Text style={styles.title}>Bem vindo ao banco do futuro!</Text>
                 <Text style={styles.subtitleHead}>
                     Seu primeiro passo para a liberdade financeira começa aqui
                 </Text>
@@ -65,6 +71,16 @@ export default function LoginScreen() {
                 <TouchableOpacity style={styles.button} onPress={handleLogin}>
                     <Text style={styles.buttonText}>Log In</Text>
                 </TouchableOpacity>
+
+                {/* Sessão de Links */}
+                <View style={{ marginTop: 50 }}>
+                    <Text style={styles.subtitle}>Não tem uma conta? <Text style={styles.link}>Sign Up</Text></Text>
+                    <Text style={styles.Terms}>
+                        Para continuar, você tem que aceitar nossos{' '}
+                        <Text style={styles.linkOfTerms}>Termos</Text> e{' '}
+                        <Text style={styles.linkOfTerms}>Política de Privacidade</Text>.
+                    </Text>
+                </View>
             </View>
         </View>
     );
