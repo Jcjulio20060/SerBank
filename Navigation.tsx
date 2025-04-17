@@ -4,6 +4,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import SplashScreen from "./src/screens/splash";
 import LoginScreen from "./src/screens/login";
 import HomeScreen from "./src/screens/home";
+import CadastroScreen from "./src/screens/cadastro";
 
 const Stack = createStackNavigator();
 
@@ -14,6 +15,7 @@ export default function Navigation() {
         <Stack.Screen name="Splash" component={SplashScreen}  />
         <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Home" component={HomeScreen} options={{ title: 'Tela Inicial' }} />
+        <Stack.Screen name="Cadastro" component={CadastroScreen} options={{ title: 'Tela de Cadastro' }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

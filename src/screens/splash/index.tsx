@@ -6,6 +6,8 @@ import { StackNavigationProp } from "@react-navigation/stack";
 type RootStackParamList = {
   Splash: undefined;
   Login: undefined;
+  Cadastro: undefined;
+  Home: undefined;
 };
 
 type Props = {
@@ -20,7 +22,7 @@ export default function SplashScreen({ navigation }: Props) {
       setProgress((oldProgress) => {
         if (oldProgress >= 1) {
           clearInterval(interval);
-          navigation.replace("Login"); // Redireciona quando chega em 100%
+          navigation.replace("Home"); // Redireciona quando chega em 100%
           return 1;
         }
         return oldProgress + 0.1; // Aumenta a barra progressivamente

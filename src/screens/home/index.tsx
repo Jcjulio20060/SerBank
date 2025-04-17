@@ -1,24 +1,20 @@
 import React from "react";
-import { View, Text, Button, StyleSheet } from "react-native";
+import { ScrollView } from "react-native";
+import Header from "../../components/Header";
+import Balance from "../../components/Balance";
+import NavigationActions from "../../components/NavigationActions";
+import GoalsList from "../../components/GoalsList";
+import TransactionsList from "../../components/TransactionsList";
+import { styles } from "./style";
 
 export default function HomeScreen() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>Tela Principal</Text>
-    </View>
+    <ScrollView style={styles.container}>
+      <Header />
+      <Balance />
+      <NavigationActions />
+      <GoalsList />
+      <TransactionsList />
+    </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#fff",
-  },
-  text: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 20,
-  },
-});

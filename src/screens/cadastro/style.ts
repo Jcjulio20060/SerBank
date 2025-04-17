@@ -1,31 +1,34 @@
-export const styles = {
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#f5f5f5',
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 20,
-    },
-    input: {
-        width: '80%',
-        padding: 10,
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 5,
-        marginBottom: 20,
-    },
-    button: {
-        width: '80%',
-        padding: 15,
-        backgroundColor: '#007BFF',
-        borderRadius: 5,
-    },
-    buttonText: {
-        color: '#fff',
-        textAlign: 'center',
-    },
-}
+import { StyleSheet } from "react-native";
+
+export const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+    padding: 16,
+  },
+  descriptionContainer: {
+    alignItems: "center",
+    marginVertical: 20,
+  },
+  title: {
+    fontSize: 30,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 10,
+    color: "#333333",
+  },
+  subtitle: {
+    fontSize: 16,
+    textAlign: "center",
+    color: "#7D7D7D",
+  },
+  imageContainer: {
+    alignItems: "center",
+    marginVertical: 20,
+  },
+  image: {
+    width: 480,
+    height: 390,
+    resizeMode: "contain",
+  },
+});

@@ -86,4 +86,14 @@ export const styles = StyleSheet.create({
         color: '#2D9CDB', // Azul para links
         textDecorationLine: 'underline',
     },
+    rememberContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginVertical: 10,
+    },
+    rememberText: {
+        fontSize: 14,
+        color: '#333333',
+    },
 });
