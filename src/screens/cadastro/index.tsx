@@ -1,6 +1,6 @@
 import React from "react";
 import { ScrollView, View, Text, Image } from "react-native";
-import Header from "../../components/LogoHeader";
+import LogoHeader from "../../components/LogoHeader";
 import FeatureCard from "../../components/FeatureCard/FeatureCard";
 import SignupForm from "../../components/SingupForm/SingupForm";
 import Footer from "../../components/Footer/Footer";
@@ -11,7 +11,10 @@ export default function CadastroScreen() {
     <ScrollView style={styles.container}>
       {/* Cabeçalho */}
       <View style={{marginTop: 50}}></View>
-      <Header />
+      <LogoHeader
+        title="Serviços bancários feitos para a Geração Z"
+        subtitle="Comece sua jornada financeira cedo com o SerBank"
+      />
 
       {/* Descrição */}
       <View style={styles.descriptionContainer}>

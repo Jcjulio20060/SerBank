@@ -1,40 +1,63 @@
-import React from "react";
-import { View, Text } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, Text, TouchableOpacity } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faBurger, faGift, faArrowRight } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { styles } from "../../screens/home/style";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export default function TransactionsList() {
-  const recentTransactions = [
-    { title: "Comida e Drinks", icon: faBurger, amount: -12.99 },
-    { title: "Presente de Aniversário", icon: faGift, amount: 50.0 },
-  ];
+const TransactionsList: React.FC = () => {
+  const navigation = useNavigation<any>(); // Replace 'any' with your navigation type if available
+  const [recentTransactions, setRecentTransactions] = useState([]);
+
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      try {
+        // Recupera o usuário logado do AsyncStorage
+        const usuarioLogado = await AsyncStorage.getItem("@userLoggedIn");
+        if (usuarioLogado) {
+          const usuario = JSON.parse(usuarioLogado);
+
+          // Obtém as duas últimas transações
+          const ultimasTransacoes = usuario.transacoesRecentes.slice(-2);
+          setRecentTransactions(ultimasTransacoes);
+        }
+      } catch (error) {
+        console.error("Erro ao carregar as transações:", error);
+      }
+    };
+
+    fetchTransactions();
+  }, []);
 
   return (
     <View style={styles.section}>
-      <View style={styles.transactionHeader}>
+      <TouchableOpacity
+        onPress={() => navigation.navigate("Historico")}
+        style={styles.transactionHeader}
+      >
         <Text style={styles.sectionTitle}>Transações Recentes</Text>
         <FontAwesomeIcon icon={faArrowRight} size={16} />
-      </View>
+      </TouchableOpacity>
 
       {recentTransactions.map((transaction, index) => (
         <View key={index} style={styles.transactionBox}>
-          <View style={styles.transactionIcon}>
-            <FontAwesomeIcon icon={transaction.icon} size={16} />
-          </View>
           <View style={styles.transactionDetails}>
-            <Text style={styles.transactionTitle}>{transaction.title}</Text>
+            <Text style={styles.transactionTitle}>{transaction.descricao}</Text>
             <Text
               style={[
                 styles.transactionAmount,
-                { color: transaction.amount < 0 ? "#E74C3C" : "#2ECC71" },
+                { color: transaction.valor < 0 ? "#E74C3C" : "#2ECC71" },
               ]}
             >
-              {transaction.amount < 0 ? "-" : "+"}R${Math.abs(transaction.amount).toFixed(2)}
+              {transaction.valor < 0 ? "-" : "+"}R$
+              {Math.abs(transaction.valor).toFixed(2)}
             </Text>
           </View>
         </View>
       ))}
     </View>
   );
-}
+};
+
+export default TransactionsList;

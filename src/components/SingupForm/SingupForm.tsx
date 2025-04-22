@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import users from "../users"; // Importa a lista de usuários
 
 export default function SignupForm() {
   const navigation = useNavigation();
@@ -9,9 +11,11 @@ export default function SignupForm() {
   const [name, setName] = useState("");
   const [age, setAge] = useState("");
   const [email, setEmail] = useState("");
+  const [cpf, setCpf] = useState("");
+  const [password, setPassword] = useState("");
 
   // Função de validação
-  const handleSignup = () => {
+  const handleSignup = async () => {
     if (!name.trim()) {
       Alert.alert("Erro", "Por favor, insira seu nome completo.");
       return;
@@ -24,9 +28,46 @@ export default function SignupForm() {
       Alert.alert("Erro", "Por favor, insira um email válido.");
       return;
     }
+    if (!cpf.trim() || cpf.length !== 14) {
+      Alert.alert("Erro", "Por favor, insira um CPF válido.");
+      return;
+    }
+    if (!password.trim() || password.length < 6) {
+      Alert.alert("Erro", "A senha deve ter pelo menos 6 caracteres.");
+      return;
+    }
 
-    // Redireciona para a tela Home após validação bem-sucedida
-    navigation.navigate("Home");
+    // Cria o novo usuário
+    const novoUsuario = {
+      nome: name,
+      sobrenome: "",
+      cpf: cpf,
+      dataNascimento: "",
+      email: email,
+      senha: password,
+      transacoesRecentes: [],
+    };
+
+    // Adiciona o novo usuário ao AsyncStorage
+    try {
+      const usuariosExistentes = await AsyncStorage.getItem("@users");
+      const usuariosAtualizados = usuariosExistentes
+        ? JSON.parse(usuariosExistentes)
+        : users;
+
+      usuariosAtualizados.push(novoUsuario);
+
+      await AsyncStorage.setItem("@users", JSON.stringify(usuariosAtualizados));
+
+      Alert.alert("Sucesso", "Conta criada com sucesso!", [
+        {
+          text: "OK",
+          onPress: () => navigation.navigate("Login"),
+        },
+      ]);
+    } catch (error) {
+      Alert.alert("Erro", "Não foi possível criar a conta. Tente novamente.");
+    }
   };
 
   return (
@@ -45,11 +86,8 @@ export default function SignupForm() {
       <Text style={{ fontSize: 24, fontWeight: "bold", marginBottom: 20 }}>
         Crie sua Conta
       </Text>
-      <Text style={{ fontSize: 14, fontWeight: "bold", marginBottom: 10 }}>
-        Nome Completo
-      </Text>
       <TextInput
-        placeholder="Digite seu nome"
+        placeholder="Nome Completo"
         value={name}
         onChangeText={setName}
         style={{
@@ -61,9 +99,6 @@ export default function SignupForm() {
           marginBottom: 10,
         }}
       />
-      <Text style={{ fontSize: 14, fontWeight: "bold", marginBottom: 10 }}>
-        Sua idade
-      </Text>
       <TextInput
         placeholder="Idade"
         value={age}
@@ -78,14 +113,39 @@ export default function SignupForm() {
           marginBottom: 10,
         }}
       />
-      <Text style={{ fontSize: 14, fontWeight: "bold", marginBottom: 10 }}>
-        Email do Responsável
-      </Text>
       <TextInput
-        placeholder="parent@example.com"
+        placeholder="Email"
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
+        style={{
+          width: "100%",
+          padding: 10,
+          borderWidth: 1,
+          borderColor: "#ccc",
+          borderRadius: 5,
+          marginBottom: 10,
+        }}
+      />
+      <TextInput
+        placeholder="CPF"
+        value={cpf}
+        onChangeText={setCpf}
+        keyboardType="numeric"
+        style={{
+          width: "100%",
+          padding: 10,
+          borderWidth: 1,
+          borderColor: "#ccc",
+          borderRadius: 5,
+          marginBottom: 10,
+        }}
+      />
+      <TextInput
+        placeholder="Senha"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
         style={{
           width: "100%",
           padding: 10,
@@ -104,7 +164,7 @@ export default function SignupForm() {
           alignItems: "center",
         }}
       >
-        <Text style={{ color: "#FFFFFF", fontWeight: "bold" }}>Get Started</Text>
+        <Text style={{ color: "#FFFFFF", fontWeight: "bold" }}>Cadastrar</Text>
       </TouchableOpacity>
     </View>
   );

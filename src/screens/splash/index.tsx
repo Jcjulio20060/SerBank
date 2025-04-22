@@ -22,7 +22,7 @@ export default function SplashScreen({ navigation }: Props) {
       setProgress((oldProgress) => {
         if (oldProgress >= 1) {
           clearInterval(interval);
-          navigation.replace("Home"); // Redireciona quando chega em 100%
+          navigation.replace("Login"); // Redireciona quando chega em 100%
           return 1;
         }
         return oldProgress + 0.1; // Aumenta a barra progressivamente
@@ -34,8 +34,8 @@ export default function SplashScreen({ navigation }: Props) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Carregando...</Text>
       <Progress.Bar progress={progress} width={200} color="#007bff" />
+      <Text style={styles.text}>Carregando...</Text>
     </View>
   );
 }
