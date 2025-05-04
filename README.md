@@ -38,6 +38,7 @@ SerBank é um aplicativo bancário moderno projetado para oferecer uma experiên
 ├── [package.json](http://_vscodecontentref_/1)           # Dependências e scripts
 ├── [tsconfig.json](http://_vscodecontentref_/2)          # Configurações do TypeScript
 └── [README.md](http://_vscodecontentref_/3)              # Documentação do projeto
+```
 
 ## Como Executar
 
@@ -57,7 +58,7 @@ npm install
 npm install
 ```
 
-5. Escaneie o QR Code no terminal com o aplicativo [Expo GO]() ou executar no emulador Android/iOS.
+5. Escaneie o QR Code no terminal com o aplicativo [Expo GO](https://expo.dev/go) ou executar no emulador Android/iOS.
 
 ## Contribuição
 
