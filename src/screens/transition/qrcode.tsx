@@ -12,21 +12,17 @@ export default function QRCodeScreen({ navigation }) {
   const fakeTransferData = {
     nome: "Fulano da Silva",
     chave: "fulano@gmail.com",
-    valor: 250.75,
-    bancoOrigem: "Banco Exemplo S.A.",
-    bancoDestino: "Banco Digital Fake",
-    comprovanteId: "1234567890",
-    data: "22/04/2025",
-    hora: "14:35",
+    valor: 250.75, // Valor a ser adicionado
+    tipo: "adicionar", // Indica que o valor será adicionado
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Escaneie o QR Code</Text>
       <Image
-  source={require("../../../assets/qrcode.png")}
-  style={styles.qrImage}
-/>
+        source={require("../../../assets/qrcode.png")}
+        style={styles.qrImage}
+      />
       <TouchableOpacity
         style={styles.button}
         onPress={() => navigation.navigate("Comprovante", fakeTransferData)}

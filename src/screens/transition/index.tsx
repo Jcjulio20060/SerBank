@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-} from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 
 const colors = {
@@ -16,10 +11,8 @@ const colors = {
 
 export default function PixScreen({ navigation }) {
   const buttons = [
-    { label: "Transferir", icon: "send", action: () => navigation.navigate('ValorPix') },
-    { label: "Ler QR code", icon: "qr-code-scanner", action: () => navigation.navigate('QRCodeScreen') },
-
-   
+    { label: "Transferir", icon: "send", action: () => navigation.navigate("ValorPix") },
+    { label: "Ler QR Code", icon: "qr-code-scanner", action: () => navigation.navigate("QRCodeScreen") },
   ];
 
   return (

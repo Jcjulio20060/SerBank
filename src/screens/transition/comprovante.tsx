@@ -1,104 +1,130 @@
-import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import Icon from "react-native-vector-icons/MaterialIcons";
+import React, { useEffect } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import users from "../../components/users"; // Importa a lista de usuários
 
 const colors = {
   primary: "#1A535C",
-  accent: "#FFE66D",
   white: "#FFFFFF",
-  gray: "#EDEDED",
   text: "#333333",
+  accent: "#FFE66D",
+  success: "#10B981",
 };
 
 export default function Comprovante({ route, navigation }) {
-  const { nome, chave, valor, bancoOrigem, bancoDestino, comprovanteId, data, hora } = route.params;
+  const { nome, chave, valor, tipo } = route.params; // Recebe o tipo de operação
+
+  useEffect(() => {
+    const updateBalances = async () => {
+      try {
+        // Recupera o usuário logado
+        const userData = await AsyncStorage.getItem("@userLoggedIn");
+        if (userData) {
+          const loggedUser = JSON.parse(userData);
+
+          // Busca o usuário logado na lista de usuários
+          const user = users.find((u) => u.cpf === loggedUser.cpf);
+          if (user) {
+            if (tipo === "adicionar") {
+              // Adiciona o valor ao saldo do usuário logado
+              user.saldo += valor;
+            } else {
+              // Remove o valor do saldo do usuário logado
+              user.saldo -= valor;
+            }
+          }
+
+          Alert.alert("Sucesso", "Operação realizada com sucesso!");
+        } else {
+          Alert.alert("Erro", "Usuário logado não encontrado.");
+        }
+      } catch (error) {
+        Alert.alert("Erro", "Não foi possível atualizar os saldos.");
+      }
+    };
+
+    updateBalances();
+  }, []);
 
   return (
     <View style={styles.container}>
-      {/* Cabeçalho */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.navigate("Home")}>
-          <Icon name="close" size={24} color={colors.white} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Comprovante</Text>
-        <View style={{ width: 24 }} />
+      <Text style={styles.title}>Comprovante de Transferência</Text>
+      <View style={styles.card}>
+        <Text style={styles.info}>
+          <Text style={styles.label}>Nome: </Text>
+          {nome}
+        </Text>
+        <Text style={styles.info}>
+          <Text style={styles.label}>Chave Pix: </Text>
+          {chave}
+        </Text>
+        <Text style={styles.info}>
+          <Text style={styles.label}>Valor: </Text>
+          <Text style={styles.value}>
+            R$ {valor.toFixed(2).replace(".", ",")}
+          </Text>
+        </Text>
       </View>
-
-      {/* Corpo */}
-      <View style={styles.content}>
-        <Text style={styles.amount}>R$ {valor.toFixed(2).replace(".", ",")}</Text>
-        <Text style={styles.label}>Transferido com sucesso</Text>
-
-        <View style={styles.infoBox}>
-          <Text style={styles.infoTitle}>Nome</Text>
-          <Text style={styles.infoValue}>{nome}</Text>
-
-          <Text style={styles.infoTitle}>Chave Pix</Text>
-          <Text style={styles.infoValue}>{chave}</Text>
-
-          <Text style={styles.infoTitle}>Banco de origem</Text>
-          <Text style={styles.infoValue}>{bancoOrigem}</Text>
-
-          <Text style={styles.infoTitle}>Banco de destino</Text>
-          <Text style={styles.infoValue}>{bancoDestino}</Text>
-
-          <Text style={styles.infoTitle}>Data e hora</Text>
-          <Text style={styles.infoValue}>{data} às {hora}</Text>
-
-          <Text style={styles.infoTitle}>Comprovante nº</Text>
-          <Text style={styles.infoValue}>{comprovanteId}</Text>
-        </View>
-      </View>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.navigate("Home")}
+      >
+        <Text style={styles.buttonText}>Voltar à Tela Inicial</Text>
+      </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.white },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    backgroundColor: colors.primary,
-    paddingTop: 50,
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-  },
-  headerTitle: {
-    color: colors.white,
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  content: {
+  container: {
     flex: 1,
     padding: 20,
+    backgroundColor: colors.white,
+    justifyContent: "center",
     alignItems: "center",
   },
-  amount: {
-    fontSize: 32,
+  title: {
+    fontSize: 20,
     color: colors.primary,
     fontWeight: "bold",
-    marginBottom: 8,
+    marginBottom: 20,
+    textAlign: "center",
   },
-  label: {
-    fontSize: 16,
-    color: colors.text,
-    marginBottom: 24,
-  },
-  infoBox: {
+  card: {
     width: "100%",
-    backgroundColor: colors.gray,
+    backgroundColor: colors.accent,
     borderRadius: 10,
     padding: 20,
+    marginBottom: 30,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  infoTitle: {
-    fontWeight: "bold",
-    fontSize: 14,
-    color: colors.primary,
-    marginTop: 12,
-  },
-  infoValue: {
+  info: {
     fontSize: 16,
     color: colors.text,
+    marginBottom: 10,
+  },
+  label: {
+    fontWeight: "bold",
+    color: colors.primary,
+  },
+  value: {
+    fontWeight: "bold",
+    color: colors.success,
+  },
+  button: {
+    backgroundColor: colors.primary,
+    padding: 15,
+    borderRadius: 8,
+    alignItems: "center",
+    width: "100%",
+  },
+  buttonText: {
+    color: colors.white,
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   TextInput,
@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Alert,
 } from "react-native";
+import * as LocalAuthentication from "expo-local-authentication";
 import { Ionicons } from "@expo/vector-icons";
 import { TextInputMask } from "react-native-masked-text";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -20,6 +21,44 @@ export default function LoginForm() {
   const [erro, setErro] = useState("");
 
   const navigation = useNavigation();
+
+  useEffect(() => {
+    verificarBiometria();
+  }, []);
+
+  const verificarBiometria = async () => {
+    const isBiometricAvailable = await LocalAuthentication.hasHardwareAsync();
+    if (!isBiometricAvailable) {
+      Alert.alert("Aviso", "Seu dispositivo não suporta autenticação biométrica.");
+      return;
+    }
+
+    const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+    if (!isEnrolled) {
+      Alert.alert("Aviso", "Nenhuma biometria cadastrada no dispositivo.");
+      return;
+    }
+
+    autenticarBiometria();
+  };
+
+  const autenticarBiometria = async () => {
+    const result = await LocalAuthentication.authenticateAsync({
+      promptMessage: "Autentique-se para acessar sua conta",
+      fallbackLabel: "Use sua senha",
+    });
+
+    if (result.success) {
+      const usuarioLogado = await AsyncStorage.getItem("@userLoggedIn");
+      if (usuarioLogado) {
+        navigation.navigate("Home");
+      } else {
+        Alert.alert("Erro", "Nenhum usuário encontrado para autenticação biométrica.");
+      }
+    } else {
+      Alert.alert("Erro", "Autenticação biométrica falhou.");
+    }
+  };
 
   const validarLogin = async () => {
     const cpfLimpo = cpf.replace(/\D/g, "");
@@ -89,6 +128,13 @@ export default function LoginForm() {
 
       <TouchableOpacity style={styles.button} onPress={validarLogin}>
         <Text style={styles.buttonText}>Entrar</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={[styles.button, { marginTop: 10 }]}
+        onPress={autenticarBiometria}
+      >
+        <Text style={styles.buttonText}>Entrar com Biometria</Text>
       </TouchableOpacity>
     </>
   );

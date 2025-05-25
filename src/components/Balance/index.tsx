@@ -1,47 +1,57 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faEyeSlash, faArrowUp, faArrowDown } from "@fortawesome/free-solid-svg-icons";
+import { faEyeSlash, faEye, faArrowUp, faArrowDown } from "@fortawesome/free-solid-svg-icons";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import users from "../users"; // Importa a lista de usuários
 import { styles } from "../../screens/home/style";
 
 export default function Balance() {
-  const navigation = useNavigation<any>(); // Replace 'any' with your navigation type if available
-  const [saldo, setSaldo] = useState(0);
+  const navigation = useNavigation<any>(); // Substitua 'any' pelo tipo correto, se disponível
+  const [saldo, setSaldo] = useState<number | null>(null);
+  const [showSaldo, setShowSaldo] = useState<boolean>(true); // Estado para controlar a visibilidade do saldo
 
   useEffect(() => {
-    const calcularSaldo = async () => {
+    const fetchSaldo = async () => {
       try {
         // Recupera o usuário logado do AsyncStorage
         const usuarioLogado = await AsyncStorage.getItem("@userLoggedIn");
         if (usuarioLogado) {
-          const usuario = JSON.parse(usuarioLogado);
+          const loggedUser = JSON.parse(usuarioLogado);
 
-          // Calcula o saldo somando as transações recentes
-          const saldoCalculado = usuario.transacoesRecentes.reduce(
-            (total: number, transacao: { valor: number }) => total + transacao.valor,
-            0
-          );
-
-          setSaldo(saldoCalculado);
+          // Busca o saldo do usuário na lista de usuários
+          const user = users.find((u) => u.email === loggedUser.email);
+          if (user) {
+            setSaldo(user.saldo || 0); // Define o saldo do usuário encontrado
+          } else {
+            console.error("Usuário não encontrado na lista.");
+          }
+        } else {
+          console.error("Nenhum usuário logado encontrado.");
         }
       } catch (error) {
-        console.error("Erro ao calcular o saldo:", error);
+        console.error("Erro ao buscar o saldo:", error);
       }
     };
 
-    calcularSaldo();
+    fetchSaldo();
   }, []);
 
   return (
     <View style={styles.balanceContainer}>
       <View style={styles.balanceHeader}>
         <Text style={styles.balanceTitle}>Saldo Disponível</Text>
-        <FontAwesomeIcon icon={faEyeSlash} size={20} style={styles.icon} />
+        <TouchableOpacity onPress={() => setShowSaldo(!showSaldo)}>
+          <FontAwesomeIcon
+            icon={showSaldo ? faEyeSlash : faEye} // Alterna entre os ícones
+            size={20}
+            style={styles.icon}
+          />
+        </TouchableOpacity>
       </View>
       <Text style={styles.balanceValue}>
-        {`R$${saldo.toFixed(2).replace(".", ",")}`}
+        {showSaldo && saldo !== null ? `R$ ${saldo.toFixed(2).replace(".", ",")}` : "••••••••"}
       </Text>
       <View style={styles.balanceActions}>
         <TouchableOpacity

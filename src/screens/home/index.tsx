@@ -5,7 +5,6 @@ import Balance from "../../components/Balance";
 import NavigationActions from "../../components/NavigationActions";
 import GoalsList from "../../components/GoalsList";
 import TransactionsList from "../../components/TransactionsList";
-import NavBar from "../../components/NavBar";
 import { styles } from "./style";
 
 export default function HomeScreen() {
@@ -18,7 +17,6 @@ export default function HomeScreen() {
         <GoalsList />
         <TransactionsList />
       </ScrollView>
-      <NavBar />
     </View>
   );
 }

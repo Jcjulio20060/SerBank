@@ -1,197 +1,132 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import users from "../../components/users"; // Importa a lista de usuários
 
 const colors = {
   primary: "#1A535C",
   accent: "#FFE66D",
   white: "#FFFFFF",
-  gray: "#EDEDED",
   text: "#333333",
 };
 
 export default function ValorPix({ navigation }) {
-  const [amount, setAmount] = useState("");
-  const MAX_BALANCE = 300;
+  const [amount, setAmount] = useState(""); // Valor inserido pelo usuário
+  const [saldo, setSaldo] = useState(0); // Saldo do usuário logado
+
+  // Função para buscar o saldo do usuário logado
+  const fetchSaldo = async () => {
+    try {
+      const userData = await AsyncStorage.getItem("@userLoggedIn");
+      if (userData) {
+        const loggedUser = JSON.parse(userData);
+
+        // Busca o usuário na lista de usuários
+        const user = users.find((u) => u.cpf === loggedUser.cpf);
+        if (user) {
+          setSaldo(user.saldo || 0); // Assume que o saldo está armazenado no objeto do usuário
+        } else {
+          Alert.alert("Erro", "Usuário não encontrado.");
+        }
+      } else {
+        Alert.alert("Erro", "Nenhum usuário logado encontrado.");
+      }
+    } catch (error) {
+      Alert.alert("Erro", "Não foi possível carregar o saldo.");
+    }
+  };
+
+  useEffect(() => {
+    fetchSaldo();
+  }, []);
+
+  // Função para limpar caracteres não numéricos e retornar um número
+  const parseCurrency = (value: string) => {
+    const numericValue = parseFloat(value.replace(/[^0-9,.-]/g, "").replace(",", "."));
+    return isNaN(numericValue) ? 0 : numericValue;
+  };
 
   const handleContinue = () => {
-    // Remove pontos e substitui vírgula por ponto para converter para número
-    const numericValue = parseFloat(amount.replace(/\./g, "").replace(",", "."));
-    
-    if (isNaN(numericValue) || numericValue <= 0) {
+    const numericValue = parseCurrency(amount); // Converte o valor para número
+    if (numericValue <= 0) {
       Alert.alert("Valor inválido", "Por favor, insira um valor maior que zero.");
       return;
     }
-    
-    if (numericValue > MAX_BALANCE) {
-      Alert.alert("Saldo insuficiente", `Seu saldo disponível é de R$ ${MAX_BALANCE.toFixed(2).replace(".", ",")}.`);
+    if (numericValue > saldo) {
+      Alert.alert(
+        "Saldo insuficiente",
+        `Você não tem saldo suficiente para esta transferência. Seu saldo disponível é de R$ ${saldo.toFixed(2).replace(".", ",")}.`
+      );
       return;
     }
-    
-    // Navega para a tela ListaPix passando o valor como parâmetro
-    navigation.navigate("ListaPix", { valorTransferencia: numericValue });
+    // Adiciona o tipo "retirar" ao navegar para ListaPix
+    navigation.navigate("ListaPix", { valorTransferencia: numericValue, tipo: "retirar" });
   };
 
   return (
     <View style={styles.container}>
-      {/* Cabeçalho */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Icon name="arrow-back" size={24} color={colors.white} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Nova Transferência</Text>
-        <View style={{ width: 24 }} />
       </View>
 
-      {/* Conteúdo */}
       <View style={styles.content}>
-        <Text style={styles.question}>Qual é o valor da transferência?</Text>
-        
-        <Text style={styles.balance}>
-          Saldo disponível: <Text style={styles.balanceValue}>R$ {MAX_BALANCE.toFixed(2).replace(".", ",")}</Text>
+        <Text style={styles.saldo}>
+          Saldo disponível: {saldo.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
         </Text>
-
-        {/* Valores rápidos em amarelo */}
-        <View style={styles.quickValues}>
-          {["10,00", "50,00", "100,00"].map((value) => (
-            <TouchableOpacity 
-              key={value}
-              style={styles.quickButton}
-              onPress={() => setAmount(value)}
-            >
-              <Text style={styles.quickText}>R$ {value}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        {/* Campo de valor */}
-        <View style={styles.amountContainer}>
-          <Text style={styles.currency}>R$</Text>
-          <TextInput
-            style={styles.amountInput}
-            placeholder="0,00"
-            placeholderTextColor={colors.primary}
-            value={amount}
-            onChangeText={setAmount}
-            keyboardType="numeric"
-            autoFocus
-          />
-        </View>
-
-        {/* Rodapé */}
-        <View style={styles.footer}>
-          {/* Botão Continuar em amarelo */}
-          <TouchableOpacity 
-            style={[styles.confirmButton, !amount && { opacity: 0.5 }]}
-            disabled={!amount}
-            onPress={handleContinue}
-          >
-            <Text style={styles.confirmText}>Continuar</Text>
-          </TouchableOpacity>
-        </View>
+        <Text style={styles.question}>Qual é o valor da transferência?</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="R$ 0,00"
+          keyboardType="numeric"
+          value={amount}
+          onChangeText={(value) => setAmount(value)} // Não formata o valor aqui
+        />
+        <TouchableOpacity
+          style={[styles.button, !amount && { opacity: 0.5 }]}
+          disabled={!amount}
+          onPress={handleContinue}
+        >
+          <Text style={styles.buttonText}>Continuar</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
 }
 
-// ... (mantenha os estilos exatamente como estão)
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.white,
-  },
+  container: { flex: 1, backgroundColor: colors.white },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: colors.primary,
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-    paddingTop: 50,
+    padding: 16,
+    marginTop: 50,
   },
-  headerTitle: {
-    color: colors.white,
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  content: {
-    flex: 1,
-    padding: 20,
-  },
-  question: {
-    color: colors.primary,
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 8,
-  },
-  balance: {
-    color: colors.text,
-    fontSize: 14,
-    marginBottom: 24,
-  },
-  balanceValue: {
-    fontWeight: 'bold',
-    color: colors.primary,
-  },
-  quickValues: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 24,
-  },
-  quickButton: {
-    backgroundColor: colors.accent, // Amarelo
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 25,
-    minWidth: 100,
-    alignItems: 'center',
-  },
-  quickText: {
-    color: colors.primary,
-    fontWeight: 'bold',
+  headerTitle: { color: colors.white, fontSize: 18, fontWeight: "bold", marginLeft: 16 },
+  content: { flex: 1, padding: 20 },
+  saldo: {
     fontSize: 16,
+    color: colors.text,
+    marginBottom: 20,
+    fontWeight: "bold",
   },
-  amountContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderBottomWidth: 2,
+  question: { fontSize: 18, color: colors.primary, marginBottom: 20 },
+  input: {
+    borderBottomWidth: 1,
     borderBottomColor: colors.primary,
-    paddingBottom: 8,
-    marginBottom: 32,
-  },
-  currency: {
+    fontSize: 24,
+    marginBottom: 20,
     color: colors.primary,
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginRight: 8,
   },
-  amountInput: {
-    flex: 1,
-    color: colors.primary,
-    fontSize: 28,
-    fontWeight: 'bold',
-  },
-  footer: {
-    marginTop: 'auto',
-  },
-  limitsButton: {
-    alignSelf: 'center',
-    marginBottom: 24,
-  },
-  limitsText: {
-    color: colors.primary,
-    textDecorationLine: 'underline',
-  },
-  confirmButton: {
-    backgroundColor: colors.accent, // Amarelo
+  button: {
+    backgroundColor: colors.accent,
     padding: 16,
     borderRadius: 8,
-    alignItems: 'center',
+    alignItems: "center",
   },
-  confirmText: {
-    color: colors.primary,
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
+  buttonText: { color: colors.primary, fontWeight: "bold" },
 });

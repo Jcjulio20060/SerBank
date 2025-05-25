@@ -32,4 +32,10 @@ export const styles = StyleSheet.create({
   transactionDetails: { flex: 1, flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
   transactionTitle: { fontSize: 14, color: "#333333" },
   transactionAmount: { fontSize: 14, fontWeight: "bold" },
+  emptyText: {
+    fontSize: 14,
+    color: "#7F8C8D",
+    textAlign: "center",
+    marginTop: 10,
+  },
 });
