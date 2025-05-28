@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, Image, ActivityIndicator } from "react-native";
 import axios from "axios";
+import { KEY_API } from "@env";
 import { styles } from "./styles"; // Importa o arquivo de estilos
 
 const colors = {
@@ -14,7 +15,7 @@ export default function InvestmentsScreen() {
   // Função para buscar dados de uma única ação da API Brapi
   const fetchInvestment = async () => {
     try {
-      const response = await axios.get("https://brapi.dev/api/quote/PETR4?token=u9e4q6hhSfUoYq5rkejkrh");
+      const response = await axios.get(`https://brapi.dev/api/quote/PETR4?token=${KEY_API}`);
       const stockData = response.data.results[0];
 
       // Define os dados da ação
